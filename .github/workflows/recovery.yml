@@ -14,12 +14,13 @@ on:
     types: [started]
 
 env:
-  MANIFEST: https://github.com/PitchBlackRecoveryProject/manifest_pb.git
-  MANIFEST_BRANCH: android-9.0
+  MANIFEST: https://github.com/Project-Fluid/manifest.git
+  MANIFEST_BRANCH: fluid-12
   DEVICE: vince
-  DT_LINK: https://github.com/rxhulkxnt44/recovery_xiaomi_vince.git
+  DT_LINK: https://github.com/rxhulkxnt44/device_xiaomi_vince.git
+  DT_BRANCH: A12-fluid-WIP
   DT_PATH: device/xiaomi/vince
-  TARGET: recoveryimage
+  TARGET: sepolicy
   TZ: Asia/Kolkata
 
 jobs:
@@ -49,21 +50,24 @@ jobs:
          run: |
              mkdir work
              cd work
-             repo init -u $MANIFEST -b $MANIFEST_BRANCH --depth=1 --groups=all,-notdefault,-device,-darwin,-x86,-mips
-             repo sync -j4
-             git clone $DT_LINK --depth=1 --single-branch $DT_PATH
-             
+             repo init -u $MANIFEST -b $MANIFEST_BRANCH --depth=1 
+             repo sync --force-sync --no-tags -no-clone-bundle --depth=1 -j4
+             git clone $DT_LINK -b $DT_BRANCH --depth=1 $DT_PATH
+             git clone $VT_LINK -b $VT_BRANCH --depth=1 $VT_PATH
        - name: Build
          run: |
               cd work
-              . build/envsetup.sh && lunch omni_$DEVICE-eng && export ALLOW_MISSING_DEPENDENCIES=true && mka $TARGET
-             
-       - uses: actions/upload-artifact@v2
-         with:
-          name: recoveryzip
-          path: work/out/target/product/*/*.zip
+              . build/envsetup.sh && lunch fluid_$DEVICE-eng && export ALLOW_MISSING_DEPENDENCIES=true && mka $TARGET
 
-       - uses: actions/upload-artifact@v2
-         with:
-          name: recoveryimage
-          path: work/out/target/product/*/*.img
+      - uses: mkrakowitzer/actions-googledrive@1
+        with:
+          # Content of `~/.skicka.tokencache.json` created by the `skicka` command
+          skicka-tokencache-json: 
+          # The path where the files to upload are located
+          upload-from: work/out/target/product/*/*.zip
+          # The path where the files to be uploaded is located
+          upload-to: 
+          # Your Google Drive API client ID
+          google-client-id: 188426772055-uk6qclui0kg4tmb2bvc1a1c9l19jd7iu.apps.googleusercontent.com
+          # Your Google Drive API client secret
+          google-client-secret: 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
