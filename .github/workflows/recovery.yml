@@ -61,20 +61,12 @@ jobs:
          run: |
               cd work
               . build/envsetup.sh && lunch fluid_$DEVICE-eng && export ALLOW_MISSING_DEPENDENCIES=true && mka $TARGET
-       - name: Interact with GDRIVE
-         uses: satackey/action-google-drive@v1.2.1
+       - uses: actions/upload-artifact@v2
          with:
-            # Content of `~/.skicka.tokencache.json` created by the `skicka` command
-            skicka-tokencache-json: ${{ secrets.SKICKA_TOKENCACHE_JSON }}
-            # The path where the files to upload are located
-            upload-from: work/out/target/product/*/*.zip
-            # The path where the files to be uploaded is located
-            upload-to: ROMTESTING
-            # Your Google Drive API client ID
-            google-client-id: ${{ secrets.GOOGLE_CLIENT_ID }}
-            # Your Google Drive API client secret
-            google-client-secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-              
+          name: romzip
+          path: work/out/target/product/*/*.zip
+          
+
          
       
       
