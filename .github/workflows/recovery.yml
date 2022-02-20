@@ -14,16 +14,12 @@ on:
     types: [started]
 
 env:
-  MANIFEST: https://github.com/Project-Fluid/manifest.git
-  MANIFEST_BRANCH: fluid-12
+  MANIFEST: https://github.com/PitchBlackRecoveryProject/manifest_pb.git
+  MANIFEST_BRANCH: android-11.0
   DEVICE: vince
-  DT_LINK: https://github.com/rxhulkxnt44/device_xiaomi_vince.git
-  DT_BRANCH: A12-fluid-WIP
+  DT_LINK: https://github.com/rk134/recovery_xiaomi_vince.git
+  DT_BRANCH: android-11.0
   DT_PATH: device/xiaomi/vince
-  VT_LINK: https://github.com/rxhulkxnt44/vendor_xiaomi_vince.git
-  VT_BRANCH: arrow
-  VT_PATH: vendor/xiaomi/vince
-  TARGET: sepolicy
   TZ: Asia/Kolkata
 
 jobs:
@@ -60,12 +56,17 @@ jobs:
        - name: Build
          run: |
               cd work
-              . build/envsetup.sh && lunch fluid_$DEVICE-eng && export ALLOW_MISSING_DEPENDENCIES=true && mka $TARGET
+              . build/envsetup.sh && lunch omni_$DEVICE-eng && export ALLOW_MISSING_DEPENDENCIES=true && mka pbrp
+             
        - uses: actions/upload-artifact@v2
          with:
-          name: romzip
+          name: recoveryzip
           path: work/out/target/product/*/*.zip
-          
+
+       - uses: actions/upload-artifact@v2
+         with:
+          name: recoveryimage
+          path: work/out/target/product/*/*.img
 
          
       
